@@ -77,6 +77,7 @@ Tsi3Cam::Tsi3Cam() :
 	pixelSize(4),
 	bitDepth(8),
 	polarImageType(Intensity),
+	colorImageType(Processed),
 	cachedImgWidth(0),
 	cachedImgHeight(0)
 {
@@ -264,6 +265,11 @@ int Tsi3Cam::Initialize()
 		ret = SetAllowedValues(MM::g_Keyword_PixelType, pixelTypeValues);
 		if (ret != DEVICE_OK)
 			return ret;
+
+		pAct = new CPropertyAction(this, &Tsi3Cam::OnColorImageType);
+		ret = CreateStringProperty(g_ColorImageType, g_ColorImageType_Processed, false, pAct);
+		AddAllowedValue(g_ColorImageType, g_ColorImageType_Processed);
+		AddAllowedValue(g_ColorImageType, g_ColorImageType_Unprocessed);
 
 	}
 	else if (sensorType == TL_CAMERA_SENSOR_TYPE_MONOCHROME)
@@ -823,7 +829,7 @@ int Tsi3Cam::ResizeImageBuffer()
    if (tl_camera_get_sensor_pixel_size_bytes(camHandle, &d))
 	   return ERR_INTERNAL_ERROR;
 
-	if (color)
+	if (color && colorImageType == Processed)
 		d = pixelSize;
 
    img.Resize(w, h, d);
@@ -946,7 +952,7 @@ void Tsi3Cam::frame_available_callback(void* /*sender*/, unsigned short* image_b
       << frame_count << ", buffer: " << instance->img.Width() << "X" << instance->img.Height();
    instance->LogMessage(os.str().c_str());
    
-	if (instance->color)
+	if (instance->color && instance->colorImageType == Processed)
 	{
 		if (instance->whiteBalancePending)
 		{

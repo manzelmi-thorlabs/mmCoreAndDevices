@@ -95,6 +95,12 @@ enum PolarImageType
 	Quad
 };
 
+enum ColorImageType
+{
+	Unprocessed = 0, 
+	Processed
+};
+
 static const char* dllLoadErr = "Error loading color processing functions from the dll";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -162,6 +168,7 @@ public:
    int OnWhiteBalance(MM::PropertyBase* pProp, MM::ActionType eAct);
    int OnPixelType(MM::PropertyBase* pProp, MM::ActionType eAct);
    int OnPolarImageType(MM::PropertyBase* pProp, MM::ActionType eAct);
+   int OnColorImageType(MM::PropertyBase* pProp, MM::ActionType eAct);
    int OnGain(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 private:
@@ -203,6 +210,7 @@ private:
    bool color;
    bool polarized;
 	PolarImageType polarImageType;
+	ColorImageType colorImageType;
 	bool whiteBalance;
 	int pixelSize;
 	int bitDepth;

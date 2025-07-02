@@ -344,6 +344,40 @@ int Tsi3Cam::OnPixelType(MM::PropertyBase* pProp, MM::ActionType eAct)
 	return DEVICE_OK;
 }
 
+int Tsi3Cam::OnColorImageType(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+    if (eAct == MM::AfterSet)
+    {
+        if (IsCapturing())
+            return DEVICE_CAMERA_BUSY_ACQUIRING;
+
+        string colorType;
+        pProp->Get(colorType);
+        if (colorType.compare(g_ColorImageType_Unprocessed) == 0)
+        {
+            colorImageType = Unprocessed;
+        }
+        else if (colorType.compare(g_ColorImageType_Processed) == 0)
+        {
+            colorImageType = Processed;
+        }        
+        else
+            assert(!"Unsupported pixel type");
+        return ResizeImageBuffer();
+    }
+    else if (eAct == MM::BeforeGet)
+    {
+        if (colorImageType == Unprocessed)
+            pProp->Set(g_ColorImageType_Unprocessed);
+        else if (colorImageType == Processed)
+            pProp->Set(g_ColorImageType_Processed);
+        else
+            assert(!"Unsupported pixel type");
+
+    }
+    return DEVICE_OK;
+}
+
 int Tsi3Cam::OnPolarImageType(MM::PropertyBase* pProp, MM::ActionType eAct)
 {
 	if (eAct == MM::AfterSet)
